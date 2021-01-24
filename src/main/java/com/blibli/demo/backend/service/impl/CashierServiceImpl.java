@@ -1,5 +1,7 @@
 package com.blibli.demo.backend.service.impl;
 
+import com.blibli.demo.backend.controller.model.request.OrderItemRequest;
+import com.blibli.demo.backend.controller.model.request.OrderRequest;
 import com.blibli.demo.backend.entity.Customer;
 import com.blibli.demo.backend.entity.Order;
 import com.blibli.demo.backend.entity.OrderItem;
@@ -13,10 +15,33 @@ import java.util.List;
 public class CashierServiceImpl implements CashierService {
 
     private static List<Order> orderList = new ArrayList<Order>();
+    private static int idOrder = 0;
 
     @Override
-    public void putOrder(Order order) {
-        orderList.add(order);
+    public void putOrder(OrderRequest order) {
+        List<OrderItemRequest> orderItemsReq = order.getOrderItems();
+        List<OrderItem> orderItems = new ArrayList<OrderItem>();
+        int idOrderItem = 0;
+        int totalHarga = 0;
+        int hargaTemp;
+        for (OrderItemRequest orderItemReq : orderItemsReq) {
+            hargaTemp = orderItemReq.getPrice() * orderItemReq.getQuantity();
+            totalHarga += hargaTemp;
+            orderItems.add(OrderItem.builder()
+                    .harga(hargaTemp)
+                    .jumlah(orderItemReq.getQuantity())
+                    .nama(orderItemReq.getProductName())
+                    .id(idOrderItem++)
+                    .build()
+            );
+        }
+        orderList.add(Order.builder()
+                .orderItems(orderItems)
+                .totalHarga(totalHarga)
+                .pelanggan(order.getPelanggan())
+                .id(idOrder++)
+                .build()
+        );
     }
 
     @Override
@@ -26,27 +51,7 @@ public class CashierServiceImpl implements CashierService {
 
     @Override
     public Order getOrderWithId(int id) {
-//        return orderList.get(id);
-        OrderItem someOrderItem = OrderItem.builder()
-                                            .harga(100)
-                                            .jumlah(3)
-                                            .nama("suatu barang")
-                                            .id(9)
-                                            .build();
-
-        List<OrderItem> someListOrderItem = new ArrayList<OrderItem>();
-        someListOrderItem.add(someOrderItem);
-
-        Customer someCustomer = Customer.builder()
-                                        .name("kevin")
-                                        .email("kevinemail")
-                                        .build();
-
-        return Order.builder()
-                    .orderItems(someListOrderItem)
-                    .totalHarga(50)
-                    .pelanggan(someCustomer)
-                    .id(id)
-                    .build();
+        Order orderWanted = orderList.stream().filter(order -> id == order.getId()).findAny().orElse(null);
+        return orderWanted;
     }
 }

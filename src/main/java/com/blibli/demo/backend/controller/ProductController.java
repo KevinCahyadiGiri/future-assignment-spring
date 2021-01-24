@@ -1,6 +1,7 @@
 package com.blibli.demo.backend.controller;
 
 import com.blibli.demo.backend.controller.model.request.InsertProductRequest;
+import com.blibli.demo.backend.controller.model.request.OrderRequest;
 import com.blibli.demo.backend.controller.model.response.ProductResponse;
 import com.blibli.demo.backend.entity.Order;
 import com.blibli.demo.backend.entity.Product;
@@ -35,9 +36,9 @@ public class ProductController {
   }
 
   @PostMapping(value="/orders")
-  public String putNewOrder(@RequestBody Order order) {
+  public String putNewOrder(@RequestBody OrderRequest order) {
     cashierService.putOrder(order);
-    return "Success";
+    return "sucess";
   }
 
 
